@@ -35,7 +35,7 @@ b { font-weight: 700; }
 .icon-btn { background: var(--card); border: 1px solid var(--line); color: var(--muted); border-radius: 8px; width: 30px; height: 26px; font-size: 15px; }
 
 /* left: g-ball + pedals */
-.left { display: flex; gap: 10px; align-items: stretch; }
+.left { display: flex; gap: 10px; align-items: stretch; overflow: hidden; min-width: 0; }
 .gball { flex: 1.2; position: relative; display: flex; align-items: center; justify-content: center; min-width: 0; }
 .gball svg { width: 100%; max-height: 100%; aspect-ratio: 1; }
 .ring { fill: none; stroke: var(--line); stroke-width: 1; } .axis { stroke: var(--line); stroke-width: 1; }
@@ -49,15 +49,15 @@ b { font-weight: 700; }
 .pbar span { position: absolute; bottom: 5px; left: 0; right: 0; text-align: center; font-size: 10px; color: #fff; mix-blend-mode: difference; letter-spacing: .08em; }
 
 /* centre */
-.center { display: flex; flex-direction: column; justify-content: space-between; gap: 6px; min-width: 0; }
-.speedwrap { flex: 1; display: flex; align-items: center; justify-content: center; gap: 4vw; min-height: 0; }
-.gear { font: 800 clamp(48px, 24vh, 150px)/1 var(--mono); color: var(--accent); min-width: .7em; text-align: center; }
+.center { display: flex; flex-direction: column; justify-content: space-between; gap: 6px; min-width: 0; min-height: 0; overflow: hidden; }
+.speedwrap { flex: 1; display: flex; align-items: center; justify-content: center; gap: 3vw; min-height: 0; overflow: hidden; }
+.gear { font: 800 min(15vh, 9vw)/1 var(--mono); color: var(--accent); min-width: .7em; text-align: center; }
 .speed { display: flex; align-items: baseline; gap: 6px; }
-.speed b { font: 800 clamp(56px, 30vh, 190px)/1 var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -.03em; }
-.speed small { font-size: clamp(11px, 3vh, 18px); color: var(--muted); }
-.call { border: 1px solid var(--line); background: var(--card); border-radius: 16px; min-height: clamp(48px, 20vh, 96px);
+.speed b { font: 800 min(19vh, 11vw)/1 var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -.03em; }
+.speed small { font-size: min(3.4vh, 2vw); color: var(--muted); }
+.call { border: 1px solid var(--line); background: var(--card); border-radius: 16px; height: 24vh; min-height: 0; overflow: hidden; flex: none;
   display: flex; align-items: center; justify-content: center; padding: 4px 12px; text-align: center; transition: background .15s, border-color .15s; }
-.call span { font: 800 clamp(26px, 11vh, 58px)/1.05 var(--mono); letter-spacing: -.02em; color: var(--muted); }
+.call span { font: 800 min(6.5vh, 3.4vw)/1.1 var(--mono); letter-spacing: -.02em; color: var(--muted); overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .call.fresh { background: color-mix(in srgb, var(--accent) 22%, var(--card)); border-color: var(--accent); }
 .call.fresh span { color: var(--text); }
 .call.brake { background: color-mix(in srgb, var(--bad) 28%, var(--card)); border-color: var(--bad); }
@@ -68,17 +68,17 @@ b { font-weight: 700; }
 .steer i { position: absolute; top: -3px; width: 12px; height: 12px; border-radius: 50%; background: var(--text); left: 50%; margin-left: -6px; }
 
 /* right */
-.right { display: flex; flex-direction: column; gap: 8px; }
+.right { display: flex; flex-direction: column; gap: 8px; overflow: hidden; min-width: 0; }
 .timer { flex: 1; display: flex; flex-direction: column; justify-content: center; min-height: 0; }
 .lbl { font: 600 11px var(--mono); color: var(--muted); letter-spacing: .08em; }
-.laptime { font: 800 clamp(26px, 11vh, 52px)/1.1 var(--mono); font-variant-numeric: tabular-nums; }
-.delta { font: 800 clamp(20px, 8vh, 36px)/1.1 var(--mono); font-variant-numeric: tabular-nums; color: var(--muted); }
+.laptime { font: 800 min(8vh, 4.2vw)/1.1 var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.delta { font: 800 min(6.5vh, 3.4vw)/1.1 var(--mono); font-variant-numeric: tabular-nums; color: var(--muted); white-space: nowrap; }
 .delta.up { color: var(--bad); } .delta.down { color: var(--good); }
 .lastbest { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 4px; font: 600 11px var(--mono); color: var(--muted); }
 .lastbest b { color: var(--text); font-size: 13px; margin-left: 2px; }
 .tyres { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; flex: none; }
 .tyre { border-radius: 10px; border: 2px solid var(--line); padding: 4px 6px; display: flex; flex-direction: column; align-items: center; background: #1a1d22; transition: border-color .3s, background .3s; }
-.tyre b { font: 700 clamp(13px, 5vh, 20px) var(--mono); }
+.tyre b { font: 700 min(4.6vh, 2.6vw)/1.2 var(--mono); }
 .tyre small { font: 600 10px var(--mono); color: var(--muted); }
 .tyre.cold { border-color: var(--blue); } .tyre.ok { border-color: var(--good); }
 .tyre.warm { border-color: var(--warn); } .tyre.hot { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 22%, #1a1d22); }
