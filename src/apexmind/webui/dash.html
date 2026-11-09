@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ApexMind">
+<meta name="theme-color" content="#000000">
+<title>ApexMind Dash</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23ff6a2b'/%3E%3Cpath d='M8 23 16 8l8 15h-5l-3-6-3 6z' fill='%230c0d0f'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="dash.css">
+</head>
+<body>
+<div id="rotate" class="rotate"><div><b>Rotate your phone</b><span>The dashboard is built for landscape.</span></div></div>
+
+<div id="dash" class="dash">
+  <header class="revbar">
+    <div id="rev" class="rev" aria-hidden="true"></div>
+    <div class="top-chips">
+      <span id="c-pos" class="pill" hidden></span>
+      <span id="c-lap" class="pill"></span>
+      <span id="c-drs" class="pill drs" hidden>DRS</span>
+      <span id="c-flag" class="pill bad" hidden></span>
+      <span id="c-live" class="pill live">Waiting</span>
+      <button id="btn-full" class="icon-btn" type="button" aria-label="Fullscreen">&#x26F6;</button>
+    </div>
+  </header>
+
+  <section class="left card">
+    <div class="gball" aria-label="G force">
+      <svg viewBox="-50 -50 100 100">
+        <circle r="46" class="ring"/><circle r="30" class="ring"/><circle r="15" class="ring"/>
+        <line x1="-46" x2="46" class="axis"/><line y1="-46" y2="46" class="axis"/>
+        <circle id="g-dot" r="5.5" class="gdot"/>
+      </svg>
+      <div class="gval"><b id="g-v">0.0</b><small>G</small></div>
+    </div>
+    <div class="pedals">
+      <div class="pbar"><i id="p-brk" class="brk"></i><b id="p-brk-v">0</b><span>BRK</span></div>
+      <div class="pbar"><i id="p-thr" class="thr"></i><b id="p-thr-v">0</b><span>THR</span></div>
+    </div>
+  </section>
+
+  <section class="center">
+    <div class="speedwrap">
+      <div id="gear" class="gear">N</div>
+      <div class="speed"><b id="speed">0</b><small>km/h</small></div>
+    </div>
+    <div id="call" class="call"><span id="call-t">&mdash;</span></div>
+    <div class="steer"><i id="steer"></i></div>
+  </section>
+
+  <section class="right card">
+    <div class="timer">
+      <div class="lbl">LAP <span id="lap-n">&ndash;</span> &middot; S<span id="sector">&ndash;</span></div>
+      <div id="laptime" class="laptime">0:00.000</div>
+      <div id="delta" class="delta">&plusmn;0.000</div>
+      <div class="lastbest"><span>LAST <b id="last">&ndash;</b></span><span>BEST <b id="best">&ndash;</b></span></div>
+    </div>
+    <div class="tyres" id="tyres">
+      <div class="tyre" data-i="2"><b>&ndash;</b><small></small></div>
+      <div class="tyre" data-i="3"><b>&ndash;</b><small></small></div>
+      <div class="tyre" data-i="0"><b>&ndash;</b><small></small></div>
+      <div class="tyre" data-i="1"><b>&ndash;</b><small></small></div>
+    </div>
+  </section>
+
+  <footer class="music card" id="music" hidden>
+    <div class="np"><div id="m-title" class="m-title">Nothing playing</div><div id="m-artist" class="m-artist"></div></div>
+    <div class="m-ctl">
+      <button type="button" data-a="volume_down" aria-label="Volume down">&#x1F509;</button>
+      <button type="button" data-a="previous" aria-label="Previous">&#x23EE;</button>
+      <button type="button" data-a="playpause" id="m-play" class="big" aria-label="Play or pause">&#x25B6;</button>
+      <button type="button" data-a="next" aria-label="Next">&#x23ED;</button>
+      <button type="button" data-a="volume_up" aria-label="Volume up">&#x1F50A;</button>
+    </div>
+    <div class="m-vol"><i id="m-vol"></i></div>
+  </footer>
+</div>
+<script src="dash.js" defer></script>
+</body>
+</html>

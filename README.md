@@ -60,6 +60,7 @@ A different layout of the same circuit (different track length) is never mixed i
 ApexMind ships a small web app (no build step, no dependencies) with two views:
 
 - **Analyze:** drop a recording (the CSV written by `--record`) to see your laps and sectors, the ideal lap, a speed-coloured racing line, every corner with its braking point and call script, a speed/pedal chart you can compare lap against lap, and the event log. Analysis runs in your browser: the real Python package is executed with [Pyodide](https://pyodide.org), so the UI never re-implements the coach.
+- **Phone dash** (`/dash`): a full-screen landscape display for a phone on the same network (`--web-host 0.0.0.0`, then open `http://<computer-ip>:8765/dash`; on iPhone use Share → Add to Home Screen for true full screen). Rev lights, speed, gear, the current call, live delta, pedals, G-force, tyres, and music controls for Music.app/Spotify on the computer (macOS only; it cannot control the phone's own music).
 - **Live:** while `apexmind listen --web` runs, a live view shows speed, pedals, lap time and the calls as they are spoken. Use `--web-host 0.0.0.0` to open it from a phone on the same network (anyone on that network can then read it).
 
 The static version of the app can be hosted on GitHub Pages (see `.github/workflows/pages.yml`); there the Live view is hidden because browsers cannot receive UDP. Build it locally with `python tools/build_site.py`.

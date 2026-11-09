@@ -47,10 +47,17 @@ class LiveHub:
         self._subs: set[queue.Queue[bytes]] = set()
         self.state: dict = {}
         self.meta: dict = {"version": __version__}
+        self.media: dict = {"available": False, "player": None}
         self.history: collections.deque[dict] = collections.deque(maxlen=history)
 
     def snapshot(self) -> dict:
-        return {"live": True, "meta": self.meta, "state": self.state, "events": list(self.history)}
+        return {"live": True, "meta": self.meta, "state": self.state,
+                "events": list(self.history), "media": self.media}
+
+    def publish_media(self, media: dict) -> None:
+        if media != self.media:
+            self.media = media
+            self._fanout("media", media)
 
     def publish_state(self, state: dict) -> None:
         self.state = state
@@ -81,7 +88,7 @@ class LiveHub:
                 pass  # a slow client simply misses frames
 
 
-def _make_handler(hub: LiveHub):
+def _make_handler(hub: LiveHub, controller=None):
     zip_cache: list[bytes] = []
 
     class Handler(BaseHTTPRequestHandler):
@@ -109,6 +116,8 @@ def _make_handler(hub: LiveHub):
                 if not zip_cache:
                     zip_cache.append(package_zip_bytes())
                 return self._send(200, zip_cache[0], "application/zip")
+            if path in ("/dash", "/dash/"):
+                path = "/dash.html"
             rel = "index.html" if path in ("", "/") else path.lstrip("/")
             target = (WEBUI_DIR / rel).resolve()
             if WEBUI_DIR.resolve() not in target.parents or not target.is_file():
@@ -117,6 +126,24 @@ def _make_handler(hub: LiveHub):
             if ctype.startswith("text/") or ctype in ("application/javascript", "application/json"):
                 ctype += "; charset=utf-8"
             self._send(200, target.read_bytes(), ctype)
+
+        def do_POST(self) -> None:  # noqa: N802
+            path = self.path.split("?", 1)[0]
+            prefix = "/api/media/"
+            if not path.startswith(prefix):
+                return self._send(404, b"not found", "text/plain")
+            # Refuse cross-site requests: a web page on another origin must not drive the music.
+            origin = self.headers.get("Origin")
+            if origin and origin.split("://", 1)[-1] != self.headers.get("Host"):
+                return self._send(403, b"forbidden", "text/plain")
+            length = int(self.headers.get("Content-Length") or 0)
+            if length:
+                self.rfile.read(min(length, 4096))
+            action = path[len(prefix):]
+            if controller is None or not controller.command(action):
+                return self._send(409, b'{"ok":false}', "application/json")
+            hub.publish_media(controller.now_playing())
+            return self._send(200, b'{"ok":true}', "application/json")
 
         def _events(self) -> None:
             self.send_response(200)
@@ -156,8 +183,8 @@ class _QuietServer(ThreadingHTTPServer):
         _LOG.warning("web request from %s failed", client_address, exc_info=True)
 
 
-def start_server(hub: LiveHub, host: str, port: int) -> ThreadingHTTPServer:
+def start_server(hub: LiveHub, host: str, port: int, controller=None) -> ThreadingHTTPServer:
     """Start serving in a background thread. Raises OSError if the port is busy."""
-    server = _QuietServer((host, port), _make_handler(hub))
+    server = _QuietServer((host, port), _make_handler(hub, controller))
     threading.Thread(target=server.serve_forever, name="apexmind-web", daemon=True).start()
     return server

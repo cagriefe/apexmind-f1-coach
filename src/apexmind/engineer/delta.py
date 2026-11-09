@@ -79,6 +79,15 @@ class DeltaTracker:
                 self._on_sector(self._sector, dist, ms)
             self._sector = lap.sector
 
+    def live_delta_ms(self, lap: LapData | None) -> int | None:
+        """Time gained (negative) or lost (positive) against the best lap at this distance."""
+        if lap is None or self.best_ms is None or self.broken or lap.lap_distance < 0:
+            return None
+        ref = _interp(self.best_trace, lap.lap_distance)
+        if ref is None or lap.current_lap_time_ms <= 0:
+            return None
+        return int(lap.current_lap_time_ms - ref)
+
     def _on_sector(self, done: int, dist: float, ms: int) -> None:
         self._marks.append((dist, ms))
         ref_now = _interp(self.best_trace, dist) if self.best_trace else None

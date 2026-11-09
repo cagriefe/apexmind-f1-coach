@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.10.0
+- Phone dashboard at `/dash`: a full-screen landscape race display (rev lights, huge speed and gear, the coach's call as a colour-coded banner, live delta to your best lap, pedals, G-force ball, tyre temperatures and wear, position, DRS, lap flags). Add it to the iPhone Home Screen for true full screen; it keeps the screen awake. Portrait shows a "rotate" hint.
+- Music card on the dashboard (macOS: Music.app and Spotify): now playing, play/pause, next/previous, volume. It controls the music player of the computer running ApexMind, not the phone's own music. Control requests from other web origins are refused.
+- `listen` prints the phone dashboard URL; the Live tab links to it.
+
 ## 0.9.4
 - The web dashboard no longer prints `ConnectionResetError` tracebacks when a browser tab closes or reloads; real server errors go to the log file.
 

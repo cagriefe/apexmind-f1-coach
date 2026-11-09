@@ -50,6 +50,7 @@ from .telemetry.packets import (
 )
 from .memory import TrackMemory, track_name
 from .recorder import Recorder
+from .media import MediaController
 from .webserver import LiveHub, start_server
 
 _LOG = logging.getLogger("apexmind")
@@ -357,6 +358,23 @@ class _State:
     debug_seen: dict[int, int] = field(default_factory=dict)
 
 
+def _dash_extras(t, m, lap, delta, st) -> dict:
+    """Extra live fields for the phone dashboard. Wheel order everywhere: RL, RR, FL, FR."""
+    ex: dict = {
+        "rev": t.rev_percent, "drs": t.drs,
+        "tyre_surf": t.tyre_surface_temp, "tyre_in": t.tyre_inner_temp,
+        "brake_temp": t.brakes_temp, "press": t.tyre_pressure,
+        "wear": None if st.damage is None else [round(x) for x in st.damage.tyres_wear],
+        "g_lat": None if m is None else round(m.g_lat, 2),
+        "g_long": None if m is None else round(m.g_long, 2),
+        "pos": None if lap is None or not lap.car_position else lap.car_position,
+        "total_laps": None if st.session is None or not st.session.total_laps else st.session.total_laps,
+        "best_ms": delta.best_ms,
+        "delta_ms": delta.live_delta_ms(lap),
+    }
+    return ex
+
+
 def _cmd_listen(args: argparse.Namespace) -> None:
     log_path = _setup_logging(args.log, args.debug)
 
@@ -642,6 +660,7 @@ def _cmd_listen(args: argparse.Namespace) -> None:
                 "invalid": bool(lap is not None and lap.current_lap_invalid),
                 "spin": spin.is_spinning, "pit": in_pit, "corners": len(an.zones),
                 "track_length": None if st.session is None else st.session.track_length,
+                **_dash_extras(t, m, lap, delta, st),
             })
         if now - st.last_hud >= 2.0:
             st.last_hud = now
@@ -769,8 +788,9 @@ def _cmd_listen(args: argparse.Namespace) -> None:
         args.web = 8765
     if args.web:
         hub = LiveHub()
+        media = MediaController()
         try:
-            server = start_server(hub, args.web_host, args.web)
+            server = start_server(hub, args.web_host, args.web, media)
         except OSError as e:
             lst.close()
             voice.close()
@@ -779,6 +799,14 @@ def _cmd_listen(args: argparse.Namespace) -> None:
 
     # Warn the user after 15 s without telemetry.
     stop_watch = threading.Event()
+
+    if hub is not None and media.available:
+        def media_poll() -> None:
+            while not stop_watch.is_set():
+                hub.publish_media(media.now_playing())
+                stop_watch.wait(2.0)
+
+        threading.Thread(target=media_poll, name="apexmind-media", daemon=True).start()
 
     def watchdog() -> None:
         while not stop_watch.wait(5.0):
@@ -802,6 +830,7 @@ def _cmd_listen(args: argparse.Namespace) -> None:
         shown = ip if wildcard else args.web_host
         scheme = "ht" + "tp"
         print(f"🌐 Web dashboard: {scheme}://{shown}:{args.web}", flush=True)
+        print(f"📱 Phone dashboard (landscape): {scheme}://{shown}:{args.web}/dash", flush=True)
         if args.open:
             _open_later(f"{scheme}://{'localhost' if wildcard else shown}:{args.web}")
     print(f"🏁 ApexMind {__version__} — listening on udp/{args.port}", flush=True)
